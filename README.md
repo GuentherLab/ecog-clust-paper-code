@@ -1,10 +1,16 @@
 # ecog_clust
-ECoG-Clust scripts
+Scripts for Meier et al: 'Lateralization and time-course of cortical phonological representations during syllable production'
 
-additional code stored on BU SCC in:
-\project\busplab\software\ecog\ecog_clust
+Key scripts for creating paper figures:
+figurure - clust x encoding, clust x hemisphere, width x coding
+/plot_cons_vow_syl_bars.m
+/plot_right_vs_left.m
+/scatter_clustvars_and_logistic_reg.m
 
-data and analyses stored in: 
-\projectnb\busplab\Experiments\ECoG_Preprocessed
-\projectnb\busplab\Experiments\ECoG_Preprocessed\AM
-\projectnb\busplab\Experiments\ECoG_Preprocessed\LJ
+figure - encoding x hemisphere, encoding on brains
+/plot_right_vs_left.m
+/surf_top_coders_per_condition.m    
+
+figure - clusters of top top encoders on brains
+/surf_top_coders_per_cluster.m
+/compile_top_coders_surf.m
