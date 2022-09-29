@@ -1,0 +1,17 @@
+ERROR DESCRIPTION:
+ 
+Undefined function 'stmf_classification' for input arguments of type 'struct'.
+
+Error in conn_process (line 105)
+ feval(fh,varargin{2:end});
+
+Error in conn_jobmanager (line 889)
+ conn_process(job(n).fcn,job(n).args{2:end});
+CONN v.20.c
+SPM12 + DEM FieldMap MEEGtools
+Matlab v.2020b
+storage: 113.6Gb available
+ 
+spm @ /project/busplab/software/spm12
+conn @ /project/busplab/software/conn
+
