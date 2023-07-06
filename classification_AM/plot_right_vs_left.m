@@ -3,7 +3,8 @@
  %%% updated 2022/7/30 by AM
  
  clear
- 
+ set_paths()
+
 set(0,'DefaultFigureWindowStyle','normal')
 %     set(0,'DefaultFigureWindowStyle','docked')
 
@@ -11,10 +12,9 @@ set(0,'DefaultFigureWindowStyle','normal')
 star_levels =     [inf, 0.05, 0.01, 0.001, 0.0001]; 
     star_symbols = {'', '*', '**', '***', '****'}; 
 
-set_paths()
-
-% data processed by the script load_top_encoders.m
-topelc_data_filename = [DATA_DIR '/topelc_data_to_surf'];
+%%%%%%%%%%% data processed by the script load_top_encoders.m
+% topelc_data_filename = [DATA_DIR '/topelc_data_to_surf'];
+topelc_data_filename = [DATA_DIR '/topelc_data_to_surf_60pct'];
 
 % load data to plot
 load(topelc_data_filename)
@@ -24,8 +24,8 @@ n_elcs = height(elc);
 %% cluster lateralization plot
 close all
 
-plotops.only_top_electrodes = 0; % if true, only plot top encoders; otherwise plot all elcs from Scott's electrode table
-plotops.save_fig = 1; 
+plotops.only_top_electrodes = 1; % if true, only plot top encoders; otherwise plot all elcs from Scott's electrode table
+plotops.save_fig = 0; 
     plotops.output_resolution = 300;
 
 plotops.inner_position = [0.17    0.1209    0.8420    0.8791];     
@@ -181,7 +181,7 @@ end
 %%  plot consonant vs vowel vs word, right vs left
 clear plotops
 
- plotops.save_fig = 1; 
+ plotops.save_fig = 0; 
     plotops.save_fig_filename = [fileparts(topelc_data_filename) '/figs/cons_vow_syl_lateralization_bars'];
     plotops.output_resolution = 300;
 

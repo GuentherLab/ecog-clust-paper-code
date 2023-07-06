@@ -9,7 +9,10 @@ function [elc, topelc, clustlist, n_elcs, nclusts] = load_top_encoders(ops)
 
 set_paths()
 vardefault('ops',struct);
+
 field_default('ops','top_proportion_electrodes', 0.3); % use this proportion of the electrodes as 'top coders'
+% field_default('ops','top_proportion_electrodes', 0.6); % use this proportion of the electrodes as 'top coders'
+
 field_default('ops','preloaded_electrode_data_filename' , [ROOT_DIR, filesep, 'projectnb/busplab/Experiments/ECoG_Preprocessed_AM/leave_one_out_data']);
 
 load(ops.preloaded_electrode_data_filename,'ow_sorted') % onset data sorted by word coding
@@ -21,6 +24,10 @@ load([ROOT_DIR, filesep, 'project/busplab/software/ecog/ecog_clust/data/clust_ti
 savename = [ROOT_DIR, filesep, 'projectnb/busplab/Experiments/ECoG_Preprocessed_AM/topelc_data_to_surf']; 
     vars_to_save = {'elc', 'elc_cons', 'elc_vow', 'elc_word', 'elc_anytop', 'topelc', 'top_proportion_electrodes',...
         'clustlist', 'clusterkey','global_clust_num_list', 'nclusts'};
+
+% savename = [ROOT_DIR, filesep, 'projectnb/busplab/Experiments/ECoG_Preprocessed_AM/topelc_data_to_surf_60pct']; 
+%     vars_to_save = {'elc', 'elc_cons', 'elc_vow', 'elc_word', 'elc_anytop', 'topelc', 'top_proportion_electrodes',...
+%         'clustlist', 'clusterkey','global_clust_num_list', 'nclusts'};
 
 %%
  %%%%%%%%%%%%%%%% organize data %%%%%%%%%%

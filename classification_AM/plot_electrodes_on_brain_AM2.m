@@ -24,60 +24,68 @@ rh_tempfile_default_name = ['rh_mnitemp_to_delete_', strrep(datestr(datetime),':
 vardefault('ops',struct);
 field_default('ops','clusters_as_colors', 0)
 field_default('ops','subjects_as_shapes', 0)
+field_default('ops','color_values_override',[])
 field_default('ops','scale',1)
-field_default('ops','suppress_brain_surfs', 0)
+field_default('ops','suppress_brain_surfs', 0) %%% not implemented
 field_default('ops','base_surfaces', {'lh.pial.smoothed.surf', 'rh.pial.smoothed.surf','rh.subcortical.surf','lh.subcortical.surf'}); 
 field_default('ops','lh_tempfile', [ROOT_DIR, '/projectnb2/busplab/surfshowfiles/temp_to_delete/', lh_tempfile_default_name])
 field_default('ops','rh_tempfile', [ROOT_DIR, '/projectnb2/busplab/surfshowfiles/temp_to_delete/', rh_tempfile_default_name])
 field_default('ops','img_savename',[])
-field_default('ops','output_resolution',300); 
-field_default('ops','selected_hemi','both');
-field_default('ops','viewpoint','left'); % anterior posterior left right superior inferior
-field_default('ops','do_mosaic', 0);
-field_default('ops','force_close',0); 
-field_default('ops','add_legend',1); 
-field_default('ops','add_title',1); 
-field_default('ops','top_k_pct',[]); 
+    field_default('ops','crop_borders_top_bot_left_right',[230,1100,240,1500]) % if not empty, crop saved image borders at this pixel values
+field_default('ops','output_resolution',300) 
+field_default('ops','selected_hemi','both')
+field_default('ops','viewpoint','left') % anterior posterior left right superior inferior
+field_default('ops','do_mosaic', 0)
+field_default('ops','force_close',0) % if true, close the surf_show window after plotting/saving image
+field_default('ops','add_legend',1) 
+field_default('ops','add_title',1) 
+field_default('ops','top_k_pct',[]) 
+field_default('ops','surfshowDir',[ROOT_DIR, '/project/busplab/software/display/surf'])
+field_default('ops','clusterkey_file',[ROOT_DIR, '/project/busplab/software/ecog/data/clusterkey']) 
 
-surfshowDir = [ROOT_DIR, '/project/busplab/software/display/surf'];
-clusterkey_file =  [ROOT_DIR, '/project/busplab/software/ecog/data/clusterkey']; 
-load(clusterkey_file, 'clusterkey');
+
+
+surfshowDir = ops.surfshowDir; 
+load(ops.clusterkey_file, 'clusterkey');
 
 surfshow_resolution = 2; % 1= lowres, 2 = highres
 
 num_electrodes = height(elc);
 
-% if toggled, map color to cluster number
-if ops.clusters_as_colors
-    close all % trying to make the legend with other figs open can cause problems
-    color_values = elc.global_clust_num; % get cluster numbers of selected electrodes
-    mincolval = 1; % fix min and max vals to encompass all 8 cluster numbers
-    maxcolval = 8; % fix min and max vals to encompass all 8 cluster numbers
-% % % %     % make colormap for clusters_as_colors that shows each of the 8 clusters distinctly
-% % % %     clusts_cmap = [ 1.0     0.5     0.0 ;...
-% % % %                     0.9     0.9     0.0 ;...
-% % % %                     0.1     1.0     0.0 ;...
-% % % %                     0.0     0.7     1.0 ;...
-% % % %                     0.0     0.0     1.0 ;...
-% % % %                     0.6     0.5     1.0 ;...
-% % % %                     0.8     0.0     0.8 ;...
-% % % %                     1.0     0.0     0.0 ];
-
-% use colormap that roughly matches cluster colors which kuzdeba used for other figures
-     clusts_cmap    = 1/255 * [168, 220, 255;... % ESP-s
-                                                0, 72, 189;...      % ESP-r
-                                                156, 247, 156;... % PtM-s
-                                                0, 153, 25;...      % PtM-r
-                                                255, 153, 204;... % ME-sb
-                                                205, 0, 60;...      % ME-sn
-                                                215, 145, 0;...    % AP-r
-                                                255, 235, 145];  % AP-s
-    field_default('ops','colormap', clusts_cmap);
-    color_values = clusts_cmap(color_values, :);
-elseif ~ops.clusters_as_colors
-    clusts_cmap = jet(8);
-    field_default('ops','colormap', clusts_cmap);
-    color_values = repmat(ops.colormap(1,:), num_electrodes, 1);
+if isfield(ops,'color_values_override') && ~isempty(ops.color_values_override)
+    color_values = ops.color_values_override; 
+elseif ~isfield(ops,'color_values_override') || isempty(ops.color_values_override)
+    if ops.clusters_as_colors % if toggled, map color to cluster number
+        close all % trying to make the legend with other figs open can cause problems
+        color_values = elc.global_clust_num; % get cluster numbers of selected electrodes
+        mincolval = 1; % fix min and max vals to encompass all 8 cluster numbers
+        maxcolval = 8; % fix min and max vals to encompass all 8 cluster numbers
+    % % % %     % make colormap for clusters_as_colors that shows each of the 8 clusters distinctly
+    % % % %     clusts_cmap = [ 1.0     0.5     0.0 ;...
+    % % % %                     0.9     0.9     0.0 ;...
+    % % % %                     0.1     1.0     0.0 ;...
+    % % % %                     0.0     0.7     1.0 ;...
+    % % % %                     0.0     0.0     1.0 ;...
+    % % % %                     0.6     0.5     1.0 ;...
+    % % % %                     0.8     0.0     0.8 ;...
+    % % % %                     1.0     0.0     0.0 ];
+    
+    % use colormap that roughly matches cluster colors which kuzdeba used for other figures
+         clusts_cmap    = 1/255 * [168, 220, 255;... % ESP-s
+                                                    0, 72, 189;...      % ESP-r
+                                                    156, 247, 156;... % PtM-s
+                                                    0, 153, 25;...      % PtM-r
+                                                    255, 153, 204;... % ME-sb
+                                                    205, 0, 60;...      % ME-sn
+                                                    215, 145, 0;...    % AP-r
+                                                    255, 235, 145];  % AP-s
+        field_default('ops','colormap', clusts_cmap);
+        color_values = clusts_cmap(color_values, :);
+    elseif ~ops.clusters_as_colors
+        clusts_cmap = jet(8);
+        field_default('ops','colormap', clusts_cmap);
+        color_values = repmat(ops.colormap(1,:), num_electrodes, 1);
+    end
 end
 
 collapse_this = 0;
@@ -94,7 +102,7 @@ while collapse_this
 end
 
 shapes_options = {  's',...    % - sphere (size --> side length, in mm) 'u',...    % - cube in MNI space (size --> diameter, in mm) || 'b',...    % - cube in image space (size --> diameter, in voxels %                     'c',...    % - crosshair in MNI space (size --> length of each axis, in mm || 'r',...    % - crosshair in image space (size --> length of each axis, in voxels
-                    'v',...    % - plumb bob
+                    'v',...    % - plumb bob... somewhat diamond-shaped
                     'z',...    % - tetrahedron (triangular pyramid) % 't',...    % - tetrahedron (rotated pyramid)
                     'a',...    % - asterisk
                     'i'};      % - icosahedron
@@ -103,44 +111,48 @@ shapes_options_verbose = {  'sphere',... % 'cube',... % 'cross',...
                             'tetrahedron',... 
                             'asterisk',...
                             'hexagon'}; % actually icosahedron
-                
-sub_nums_vector = elc.subject;
-shapes = char(num_electrodes, 1);
-shapes_verbose = cell(num_electrodes, 1);
-
-if ops.subjects_as_shapes                
-    shapes = char(elc.surf_shape);
-    for s_idx = 1:length(shapes)
-        shapes_verbose(s_idx) = shapes_options_verbose(strcmp(shapes(s_idx), shapes_options));
+        
+if num_electrodes > 0
+    sub_nums_vector = elc.subject;
+    shapes = char(num_electrodes, 1);
+    shapes_verbose = cell(num_electrodes, 1);
+    
+    if isfield(ops,'shapes')
+        shapes = ops.shapes;
+    elseif ops.subjects_as_shapes                
+        shapes = char(elc.surf_shape);
+        for s_idx = 1:length(shapes)
+            shapes_verbose(s_idx) = shapes_options_verbose(strcmp(shapes(s_idx), shapes_options));
+        end
+    else
+        shapes = repmat(shapes_options{1}, num_electrodes, 1);
     end
-else
-    shapes = repmat(shapes_options{1}, num_electrodes, 1);
+    
+    lefthemi_vector = isnan(elc.right_hemi);
+    righthemi_vector = ~isnan(elc.right_hemi);
+    alignment_vector = elc.type;
+    global_clust_num_vector = elc.global_clust_num; 
+    
+    try
+    surf_plot_data_table = table(alignment_vector, sub_nums_vector, shapes, shapes_verbose, global_clust_num_vector,...
+        'VariableNames', {'type', 'sub_num', 'shape', 'shape_long', 'global_clust_num'});
+    end
+    
+    
+    % clust_name_vector = cell(height(surf_plot_data_table),1);
+    % clust_name_vector(:) = clusterkey.name(clusterkey.global_clust_num == global_clust_num_vector(1));
+    % surf_plot_data_table.clust_name = clust_name_vector; 
+    
+    % save mni coordinates to be plotted as .txt file
+    mni_coords = elc.mni_coord; 
+    
+    % writematrix([mni_coords, zeros(size(electrode_table_indices)), shapes], ops.tempfile);
+    mni_coords = mat2cell(mni_coords, ones(size(mni_coords, 1),1), ones(1,size(mni_coords, 2)));
+    mni_coords(:,4) = mat2cell(ones(size(num_electrodes)), ones(size(num_electrodes, 1), 1), ones(1, size(num_electrodes, 2)));
+    mni_coords(:,5) = mat2cell(shapes, ones(size(shapes, 1), 1), ones(1, size(shapes, 2)));
+    writecell(mni_coords(lefthemi_vector, :), ops.lh_tempfile);
+    writecell(mni_coords(righthemi_vector, :), ops.rh_tempfile);
 end
-
-lefthemi_vector = isnan(elc.right_hemi);
-righthemi_vector = ~isnan(elc.right_hemi);
-alignment_vector = elc.type;
-global_clust_num_vector = elc.global_clust_num; 
-
-try
-surf_plot_data_table = table(alignment_vector, sub_nums_vector, shapes, shapes_verbose, global_clust_num_vector,...
-    'VariableNames', {'type', 'sub_num', 'shape', 'shape_long', 'global_clust_num'});
-end
-
-
-% clust_name_vector = cell(height(surf_plot_data_table),1);
-% clust_name_vector(:) = clusterkey.name(clusterkey.global_clust_num == global_clust_num_vector(1));
-% surf_plot_data_table.clust_name = clust_name_vector; 
-
-% save mni coordinates to be plotted as .txt file
-mni_coords = elc.mni_coord; 
-
-% writematrix([mni_coords, zeros(size(electrode_table_indices)), shapes], ops.tempfile);
-mni_coords = mat2cell(mni_coords, ones(size(mni_coords, 1),1), ones(1,size(mni_coords, 2)));
-mni_coords(:,4) = mat2cell(ones(size(num_electrodes)), ones(size(num_electrodes, 1), 1), ones(1, size(num_electrodes, 2)));
-mni_coords(:,5) = mat2cell(shapes, ones(size(shapes, 1), 1), ones(1, size(shapes, 2)));
-writecell(mni_coords(lefthemi_vector, :), ops.lh_tempfile);
-writecell(mni_coords(righthemi_vector, :), ops.rh_tempfile);
 
 % 
 % if ~ops.suppress_brain_surfs
@@ -267,11 +279,18 @@ end
 % if specified, save 
 if ~isempty(ops.img_savename)
     surfshow_ax= gca;
-    set(surfshow_ax,'Position',[.15 .15 .7 .7])
+    set(surfshow_ax,'Position',[.15 .15 .7 .7]) % crop borders
     tempfig= figure('Visible','off'); % Invisible figure
     temp_ax = copyobj(surfshow_ax,tempfig); % Copy the appropriate axes
     print(tempfig, ops.img_savename, '-dpng', ['-r', num2str(ops.output_resolution)]); % save the image to file
     close(tempfig)
+
+    if ~isempty(ops.crop_borders_top_bot_left_right)
+        img = imread([ops.img_savename '.png']); % reload image
+        img_cropped = img(ops.crop_borders_top_bot_left_right(1):ops.crop_borders_top_bot_left_right(2),...
+            ops.crop_borders_top_bot_left_right(3):ops.crop_borders_top_bot_left_right(4),:);
+        imwrite(img_cropped,[ops.img_savename '.png']) % overwrite with cropped image
+    end
 end
     
 delete(ops.lh_tempfile) % delete temporary mni coordinates file

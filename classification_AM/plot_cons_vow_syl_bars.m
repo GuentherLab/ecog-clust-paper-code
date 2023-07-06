@@ -1,4 +1,4 @@
- % plot top encoding electrodes for consonant, vowel, and syllable in a combined bar graph
+ % plot proportions of top encoding electrodes for consonant, vowel, and syllable in a combined bar graph
 %
 % updated by AM 2022/8/1
 clear
@@ -50,7 +50,7 @@ plotops.legend_position = [0.78 0.8 0.25 0.178]; % x,y,width,height
 plotops.leg_border_color = [1 1 1]; % color of border around legend
 plotops.leg_fontsize = 18;
 
-plotops.ebar_line_width = 0.5;
+plotops.ebar_line_width = 1;
 plotops.ebar_line_style = 'none';
 plotops.ebar_color = [0 0 0];
 
@@ -161,7 +161,8 @@ for ifeat = 1:nfeats
     end
     topelc{:, ['sgn_bonf_',thisfeat]} = topelc{:, ['p_binotest_', thisfeat]} < alpha_bonf;
     
-     % FDR correction
+     % comparison of phonunits within each cluster, with FDR correction
+     %%%%% no code written for sgn stars because all qval are > 0.05
      topelc{:, ['q_binotest_', thisfeat]} = conn_fdr(topelc{:, ['p_binotest_', thisfeat]}); 
      for iclust = 1:nclusts % need to run FDR and set star values after computing all base p-values
          starind = find(topelc{iclust, ['q_binotest_', thisfeat]} < star_levels, 1, 'last');
@@ -170,7 +171,8 @@ for ifeat = 1:nfeats
      topelc{:, ['sgn_fdr_',thisfeat]} = topelc{:, ['q_binotest_', thisfeat]} < 0.05;
 end
      
-%%%%% no code written for sgn stars because all qval are > 0.05
+fdr_corrected_chi_p_cons_vow_syl = conn_fdr(chi_p)
+
 
 
 
